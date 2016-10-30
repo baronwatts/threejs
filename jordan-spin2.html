@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+<style>
+
+	
+html, body{  margin: 0; height: 100%;}
+
+
+section{ height: 100%; }
+section > *{ width: 50%; height: 100%; float: left;}
+
+.wrap{ background: #222; color: white; font-size: 1.5em;}
+.wrap > * { width: 80%; text-align:center; margin:auto;}
+.wrap h1{margin-top: 50px;}
+
+
+
+
+#appcontainer{
+			width: 100%;
+			height: 100%;
+			position: absolute;
+			top: 0;
+			left: 0;
+			background-color: #999;
+			overflow: hidden;
+		}
+		#displaybox{
+			width: 30px;
+			height: 30px;
+			position: relative;
+			float: left;
+			background-color: tomato;
+		}
+		#infobox{
+			width: 30px;
+			height: 30px;
+			position: relative;
+			float: left;
+			background-color: skyblue;
+		}
+		#infobox nav{
+			width: 100px;
+			height: 40px;
+			background-color: forestgreen;
+		}
+		#infobox nav a:link{
+			width: 50px;
+			height: 40px;
+			background-color: teal;
+			color: white;
+			float: left;
+			text-align: center;
+		}
+
+
+
+
+
+</style>
+<body>
+
+
+<section>
+	<div id="container"></div>
+
+	<div class="wrap">
+		<h1>Transitioning Your Patients To MaxZir Crowns</h1>
+
+
+		<small>Statistics suggest more than 15 million people in the United States have crowns to help them deal with dental problems, and the market for good crown materials seems to be growing every year. Given that most crown materials last just ten years at the most, finding the perfect crown for patients is an absolute must.</small>
+	</div>
+
+</section>
+
+
+
+
+
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+
+
+
+<script src='three.js'></script>
+<script src='js/OrbitControls.js'></script>
+<script src="js/AssimpJSONLoader.js"></script>
+<script src="js/MTLLoader.js"></script>
+<script src='js/OBJLoader.js'></script>
+
+
+
+
+
+
+<script>
+/* 
+Renderer - bgcolor, size, append
+
+SET UP SCENE & CAMERA
+Scene
+Camera
+Controls(Camera)
+
+
+SET UP SHAPES & MATERIAL
+Geometry
+Material
+Mesh(Geometry, Material) => add to the scene
+
+
+RENDER
+render(scene, camera)
+*/
+
+
+
+
+
+ var WIDTH =  $(".wrap").width(),
+     HEIGHT =  $(".wrap").height();
+
+   
+
+    var renderer, scene, camera, cube;
+    init();
+    function init(){
+       var container = document.getElementById("container");
+
+       renderer = new THREE.WebGLRenderer();
+       renderer.setSize(WIDTH, HEIGHT);
+       renderer.setClearColor( new THREE.Color('white'), 1);
+       container.appendChild(renderer.domElement);
+
+       camera = new THREE.PerspectiveCamera(45, WIDTH /HEIGHT , 0.1, 1000);
+       scene = new THREE.Scene();
+    
+       scene.add(camera);
+       camera.position.z = 1;
+    
+       /*cube = new THREE.Mesh( new THREE.CubeGeometry(200, 200, 200) );
+       cube.position.y = 0;
+       cube.position.z = -150;
+       scene.add(cube);*/
+
+       //add light
+	scene.add( new THREE.AmbientLight( 'white', 0.8 ) );
+	var directionalLight = new THREE.DirectionalLight( 0xeeeeee, 0.5 );
+	/*directionalLight.position.x = Math.random() - 0.5;
+	directionalLight.position.y = Math.random();
+	directionalLight.position.z = Math.random() - 0.5;*/
+	directionalLight.position.set(0, 400, 400).normalize(); //x,y,z. light source is coming from same angle as camera position
+	scene.add( directionalLight );
+
+
+
+       //load obj and mtl
+		var mtlLoader = new THREE.MTLLoader();
+		mtlLoader.setPath( 'models/' );
+		mtlLoader.load( 'crown.mtl', function( materials ) {
+			materials.preload();
+			var objLoader = new THREE.OBJLoader();
+			objLoader.setMaterials( materials );
+			objLoader.setPath( 'models/' );
+			objLoader.load( 'crown.obj', function ( object ) {
+				
+				scene.add( object );
+			});
+		});
+
+
+		//resize viewport
+		window.addEventListener('resize', function(){
+			var width = WIDTH;
+			var height = HEIGHT;
+			renderer.setSize( width, height);
+
+			camera.aspect = width / height; 
+			camera.updateProjectionMatrix();
+		});
+
+
+
+    
+       
+    };
+    
+   
+var update = function(){
+
+
+	var timer = Date.now() * 0.0005;
+
+	camera.position.x = Math.cos( timer ) * 10;
+	camera.position.y = 4;
+	camera.position.z = Math.sin( timer ) * 10;
+
+	camera.lookAt( scene.position );
+
+};
+
+//draw scene
+var render = function(){
+	 
+	renderer.render(scene, camera);
+};
+
+//run game loop (update, render, repeat)
+var GameLoop = function(){
+
+	requestAnimationFrame (GameLoop);
+
+	update();
+	render();
+
+};
+
+GameLoop();
+
+
+
+
+
+/*Chart*/
+var chrt = document.getElementById("chart1").getContext("2d");
+    var monthArray = ["January", "February", "March", "April", "May", "June"];
+    var revenueArray = [20, 59, 80, 81, 56, 55];
+    var chrtType = "doughnut"; /*  bar, line, pie, doughnut, radar, polarArea */
+
+    var data = {
+      labels: monthArray, //x-axis
+      datasets: [
+        {
+          label: "Revenue",
+          backgroundColor: "rgba(237,246,250,0.9)",
+          data:revenueArray, // y-axis
+
+          //line chart options
+          fill: true,
+          borderColor: "rgba(2,186,232,0.6)",
+          pointBackgroundColor: "red",
+          pointBorderColor: "#fff",
+          pointBorderWidth: 2,
+          pointRadius: 5
+        }
+      ]
+    };
+
+    var option = {
+      legend: {display: false },
+      animation: { duration: 1000, easing: 'easeOutBounce'},
+      title: { display: true, text: 'Revenue for the last 6 months', fontSize: 16},
+      scales: { yAxes: [{ stacked: true }], xAxes: [{ gridLines: {display: false} }]}
+    }
+
+
+
+    var myChart = new Chart(chrt, {
+      type: chrtType,
+      data: data,
+      options: option,
+    });
+
+
+    //add data to chart
+    /*function adddata(){
+      revenueArray.push(60);
+      monthArray.push('August');
+      myChart.update();
+    }
+
+    adddata();*/
+
+
+
+
+
+
+	
+
+
+	//add light
+	/*scene.add( new THREE.AmbientLight( 'white', 0.8 ) );
+	var directionalLight = new THREE.DirectionalLight( 0xeeeeee );
+	directionalLight.position.x = Math.random() - 0.5;
+	directionalLight.position.y = Math.random();
+	directionalLight.position.z = Math.random() - 0.5;
+	directionalLight.position.set(0, 400, 400).normalize(); //x,y,z. light source is coming from same angle as camera position
+	scene.add( directionalLight );*/
+
+			
+
+
+/*camera.position.z = 1;*/
+
+//game logic. spin
+/*var update = function(){*/
+
+/*
+	var timer = Date.now() * 0.0005;
+
+	camera.position.x = Math.cos( timer ) * 10;
+	camera.position.y = 4;
+	camera.position.z = Math.sin( timer ) * 10;
+
+	camera.lookAt( scene.position );*/
+
+/*};*/
+
+//draw scene
+/*var render = function(){
+	renderer.render(scene, camera);
+};
+*/
+//run game loop (update, render, repeat)
+/*var GameLoop = function(){
+
+	requestAnimationFrame (GameLoop);
+
+	update();
+	render();
+
+};
+
+GameLoop();*/
+</script>
+</body>
+</html>

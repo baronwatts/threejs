@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+<script src='three.js'></script>
+<script src='js/OrbitControls.js'></script>
+<body>
+
+
+<script>
+/*
+Renderer - bgcolor, size, append
+
+SET UP SCENE & CAMERA
+Scene
+Camera
+Controls(Camera)
+
+
+SET UP SHAPES & MATERIAL
+Geometry
+Material
+Mesh(Geometry, Material) => add to the scene
+
+
+RENDER
+render(scene, camera)
+
+
+*/
+(function(){
+
+	//scene
+	var scene = new THREE.Scene();
+
+	//camera
+	var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
+
+	//render
+	var renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    //bg color
+    renderer.setClearColor( new THREE.Color('lightgrey'), 1);
+
+    //add to the body
+    document.body.appendChild(renderer.domElement);
+
+     //add Shape and Material to mesh			width,length,height
+    var shape = new THREE.Mesh(new THREE.CylinderGeometry(200,200, 200), new THREE.MeshPhongMaterial({
+    	color: 'lightblue',
+    	specular: 'green',
+    	shininess: '10',
+    	shading: THREE.FlatShading,
+    	wireframe: true
+
+    	//shininess - high value will be less blurry and more narrow
+    	//shading = FlatShading will be less smooth and you will see more ploygons
+    }));
+
+    //change rotation
+    /*cube.rotation.z = deg20;*/
+    scene.add(shape);
+	
+
+	/*@TODO watch requestAimationFrame tutorials*/
+	
+	function animate(){
+	
+		shape.rotation.x += 0.02;
+		shape.rotation.y += 0.02;
+		shape.rotation.z += 0.02;
+
+		requestAnimationFrame(animate);
+		renderer.render(scene, camera);
+		
+	}
+
+
+	
+
+    var deg45 = 45 * (Math.PI / 180); //45 * 1deg
+    var deg20 = 20 * (Math.PI / 180); //20 * 1deg
+
+   
+	camera.position.y = -400; //backwards
+	camera.position.z = 400; // up & down
+	camera.rotation.x = deg45; // forward looking straight on
+
+    
+
+   
+/*
+    renderer.render(scene, camera);*/
+
+    var light = new THREE.DirectionalLight('white', 1);
+		light.position.set(0, -400, 400).normalize(); //x,y,z. light source is coming from same angle as camera position
+		scene.add(light);
+
+    animate();
+
+    /*
+		Meshes Basic
+		MeshBasicMaterial({
+			color: 'red',
+			wireframe: 'true',
+			wireframeLinewidth: '5',
+		});
+		Mesh Normal
+		MeshNormalMaterial(); => default three,js styles
+    */
+
+
+})()
+	
+</script>
+</body>
+</html>

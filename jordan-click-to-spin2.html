@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+<style>
+	body{  margin: 0; }
+	canvas{ width: 100%; height: 100%; }
+</style>
+<body>
+
+
+
+
+
+
+<script src='three.js'></script>
+<script src='js/OrbitControls.js'></script>
+<script src="js/AssimpJSONLoader.js"></script>
+<script src="js/MTLLoader.js"></script>
+<script src='js/OBJLoader.js'></script>
+<script>
+/* 
+Renderer - bgcolor, size, append
+
+SET UP SCENE & CAMERA
+Scene
+Camera
+Controls(Camera)
+
+
+SET UP SHAPES & MATERIAL
+Geometry
+Material
+Mesh(Geometry, Material) => add to the scene
+
+
+RENDER
+render(scene, camera)
+*/
+
+var scene = new THREE.Scene();
+var camera = new THREE.PerspectiveCamera( 25, window.innerWidth / window.innerHeight, 0.1, 1000); //0.1, 1000is the clipping plane(how much you can see)
+camera.position.set( 0,20, 0 ); // x,y,z  distance, above, angle
+
+var renderer = new THREE.WebGLRenderer();
+
+//get full width and height of the viewport
+renderer.setSize( window.innerWidth, window.innerHeight);
+
+//set background color
+ renderer.setClearColor( new THREE.Color('white'), 1);
+
+//inserts canvas on the page
+document.body.appendChild(renderer.domElement);
+
+
+//resize viewport
+window.addEventListener('resize', function(){
+	var width = window.innerWidth;
+	var height = window.innerHeight;
+	renderer.setSize( width, height);
+
+	camera.aspect = width / height; 
+	camera.updateProjectionMatrix();
+})
+
+//controls
+var controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+
+//load 3d model - JSON
+/*var loader1 = new THREE.AssimpJSONLoader();
+	loader1.load( 'models/glass2.json', function ( object ) {
+
+		object.scale.multiplyScalar( 0.05 );
+		scene.add( object );
+
+	});*/
+
+	// load interior model
+	/*var loader2 = new THREE.AssimpJSONLoader();
+	loader2.load( 'models/glass2.json', function ( object ) {
+
+		scene.add( object );
+
+	});
+*/
+
+	//load obj and mtl
+	var mtlLoader = new THREE.MTLLoader();
+	mtlLoader.setPath( 'models/' );
+	mtlLoader.load( 'jordan.mtl', function( materials ) {
+		materials.preload();
+		var objLoader = new THREE.OBJLoader();
+		objLoader.setMaterials( materials );
+		objLoader.setPath( 'models/' );
+		objLoader.load( 'jordan.obj', function ( object ) {
+			
+			scene.add( object );
+		});
+	});
+
+
+	//add light
+	scene.add( new THREE.AmbientLight( 'white', 0.8 ) );
+	var directionalLight = new THREE.DirectionalLight( 0xeeeeee );
+	directionalLight.position.x = Math.random() - 0.5;
+	directionalLight.position.y = Math.random();
+	directionalLight.position.z = Math.random() - 0.5;
+	directionalLight.position.set(0, 400, 0).normalize(); //x,y,z. light source is coming from same angle as camera position
+	scene.add( directionalLight );
+
+			
+
+
+camera.position.x = 200;
+camera.position.y = 400;
+
+
+//game logic. spin
+var update = function(){
+
+/*
+	var timer = Date.now() * 0.0005;
+
+	camera.position.x = Math.cos( timer ) * 10;
+	camera.position.y = 200;
+	camera.position.z = Math.sin( timer ) * 10;
+
+	camera.lookAt( scene.position );*/
+
+};
+
+//draw scene
+var render = function(){
+	renderer.render(scene, camera);
+};
+
+//run game loop (update, render, repeat)
+var GameLoop = function(){
+
+	requestAnimationFrame (GameLoop);
+
+	update();
+	render();
+
+};
+
+GameLoop();
+</script>
+</body>
+</html>
